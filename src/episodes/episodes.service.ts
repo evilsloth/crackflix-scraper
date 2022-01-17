@@ -4,6 +4,7 @@ import { forkJoin, map, Observable, of, switchMap, tap } from 'rxjs';
 import { AllDebridResponse } from 'src/common/all-debrid/all-debrid-response';
 import { AllDebridService } from 'src/common/all-debrid/all-debrid.service';
 import { MagnetInstantStatus } from 'src/common/all-debrid/magnets/magnet-instant-status';
+import { MagnetLinks } from 'src/common/all-debrid/magnets/magnet-links';
 import { A4kScrapersService } from 'src/common/scrapers/a4k-scrapers/a4k-scrapers.service';
 import { ScraperEpisodeSearchParams } from 'src/common/scrapers/a4k-scrapers/scraper-episode-search-params';
 import { ScraperEpisodeSource } from 'src/common/scrapers/a4k-scrapers/scraper-episode-source';
@@ -11,6 +12,9 @@ import { filterDuplicates, groupBy } from 'src/common/utils/array-utils';
 import { EpisodeFileLink } from './episode-file-link';
 import { EpisodeSearchParams } from './episode-search-params';
 import { EpisodeSource } from './episode-source';
+
+const VIDEO_EXTENSIONS = ['webm', 'mkv', 'flv', 'vob', 'ogv', 'ogg', 'avi', 'mp4', 'mts', 'm2ts', 'ts', 'mov', 'wmv',
+    'rm', 'rmvb', 'm4p', 'm4v', 'mpg', 'mp2', 'mpeg', 'mpe', 'mpv', 'm2v', '3gp', 'divx', 'xvid']
 
 @Injectable()
 export class EpisodesService {
@@ -58,7 +62,7 @@ export class EpisodesService {
             map(response => this.extractAllDebridResponseData(response).magnets[0]),
             switchMap(magnet => this.allDebridService.getMagnetStatus(magnet.id)),
             map(response => this.extractAllDebridResponseData(response).magnets),
-            switchMap(status => this.allDebridService.getUnlockedLink(status.links[0].link)),
+            switchMap(status => this.allDebridService.getUnlockedLink(this.findVideoLink(status.links))),
             map(response => this.extractAllDebridResponseData(response)),
             map(link => ({
                 fileName: link.filename,
@@ -66,6 +70,11 @@ export class EpisodesService {
                 fileSize: link.filesize
             }))
         );
+    }
+
+    private findVideoLink(links: MagnetLinks[]): string {
+        const found = links.find(link => VIDEO_EXTENSIONS.indexOf(link.filename.split('.').pop().toLowerCase()) !== -1);
+        return found?.link || links[0].link;
     }
 
     private getInstantStatuses(sources: ScraperEpisodeSource[]): Observable<MagnetInstantStatus[]> {
