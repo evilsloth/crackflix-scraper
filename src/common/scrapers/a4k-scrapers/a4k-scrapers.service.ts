@@ -4,7 +4,8 @@ import { ConfigService } from '@nestjs/config';
 import { AxiosResponse } from 'axios';
 import { Observable } from 'rxjs';
 import { ScraperEpisodeSearchParams } from './scraper-episode-search-params';
-import { ScraperEpisodeSource } from './scraper-episode-source';
+import { ScraperSource } from './scraper-source';
+import { ScraperMovieSearchParams } from './scraper-movie-search-params';
 
 @Injectable()
 export class A4kScrapersService {
@@ -15,8 +16,12 @@ export class A4kScrapersService {
         this.baseUrl = configService.get<string>('A4K_SCRAPER_BASE_URL');
     }
 
-    getEpisodes(params: ScraperEpisodeSearchParams): Observable<AxiosResponse<ScraperEpisodeSource[]>> {
+    getEpisodes(params: ScraperEpisodeSearchParams): Observable<AxiosResponse<ScraperSource[]>> {
         return this.http.get(this.baseUrl + '/episodes', { params });
+    }
+
+    getMovies(params: ScraperMovieSearchParams): Observable<AxiosResponse<ScraperSource[]>> {
+        return this.http.get(this.baseUrl + '/movies', { params });
     }
 
     getScrapers(): Observable<AxiosResponse<string[]>> {

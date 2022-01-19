@@ -1,4 +1,4 @@
-export interface EpisodeSource {
+export interface Source {
     title: string;
     type: 'torrent' | 'cached_torrent';
     url: string;

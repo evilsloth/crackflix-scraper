@@ -1,6 +1,7 @@
 import { CacheModule, Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { EpisodesModule } from './episodes/episodes.module';
+import { MoviesModule } from './movies/movies.module';
 
 @Module({
     imports: [
@@ -13,7 +14,8 @@ import { EpisodesModule } from './episodes/episodes.module';
             isGlobal: true,
             envFilePath: ['config/.env.local', 'config/.env']
         }),
-        EpisodesModule
+        EpisodesModule,
+        MoviesModule
     ],
     controllers: [],
     providers: []
