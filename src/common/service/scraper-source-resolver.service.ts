@@ -26,7 +26,6 @@ export class ScraperSourceResolverService {
             map(scrapers => scrapers.map(scraper => searchResultsGetter(scraper))),
             switchMap(requests => forkJoin(requests)),
             map(responses => responses.reduce((array, response) => [...array, ...response.data], [])),
-            map(sources => sources.filter(source => source.package === 'single')),
             map(sources => filterDuplicates(sources, (s1, s2) => s1.magnet === s2.magnet)),
             switchMap(sources => forkJoin([of(sources), this.getInstantStatuses(sources)])),
             map(([sources, instantStatuses]) => {
@@ -36,6 +35,7 @@ export class ScraperSourceResolverService {
                     type: (instantByMagnet[source.hash] && instantByMagnet[source.hash][0]?.instant) ? 'cached_torrent' : 'torrent',
                     url: source.magnet,
                     scraper: source.scraper || source.provider_name_override,
+                    package: source.package,
                     size: source.size,
                     seeds: source.seeds
                 }));
@@ -43,12 +43,12 @@ export class ScraperSourceResolverService {
         );
     }
 
-    getStreamingLink(url: string): Observable<FileLink> {
+    getStreamingLink(url: string, linkFilter: (link: MagnetLinks) => boolean = null): Observable<FileLink> {
         return this.allDebridService.uploadMagnet(url).pipe(
             map(response => this.extractAllDebridResponseData(response).magnets[0]),
             switchMap(magnet => this.allDebridService.getMagnetStatus(magnet.id)),
             map(response => this.extractAllDebridResponseData(response).magnets),
-            switchMap(status => this.allDebridService.getUnlockedLink(this.findVideoLink(status.links))),
+            switchMap(status => this.allDebridService.getUnlockedLink(this.findVideoLink(status.links, linkFilter))),
             map(response => this.extractAllDebridResponseData(response)),
             map(link => ({
                 fileName: link.filename,
@@ -58,9 +58,19 @@ export class ScraperSourceResolverService {
         );
     }
 
-    private findVideoLink(links: MagnetLinks[]): string {
-        const found = links.find(link => VIDEO_EXTENSIONS.indexOf(link.filename.split('.').pop().toLowerCase()) !== -1);
-        return found?.link || links[0].link;
+    private findVideoLink(links: MagnetLinks[], filter: (link: MagnetLinks) => boolean): string {
+        const found = links
+            .filter(link => VIDEO_EXTENSIONS.indexOf(link.filename.split('.').pop().toLowerCase()) !== -1)
+            .filter(filter || (link => link));
+
+        // biggest first (in case of samples in package)
+        found.sort((a, b) => b.size - a.size);
+        if (found.length > 0) {
+            return found[0]?.link;
+        }
+
+        console.error('Reolve error', links);
+        throw Error('Could not resolve video stream link');
     }
 
     private getInstantStatuses(sources: ScraperSource[]): Observable<MagnetInstantStatus[]> {

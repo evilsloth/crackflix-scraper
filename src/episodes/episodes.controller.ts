@@ -17,8 +17,11 @@ export class EpisodesController {
     }
     
     @Get('episodes/link')
-    getStreamingLink(@Query('magnet') magnet: string): Observable<FileLink> {
-        return this.episodesService.getStreamingLink(magnet).pipe(
+    getStreamingLink(
+        @Query('magnet') magnet: string,
+        @Query('season') season?: number,
+        @Query('episode') episode?: number): Observable<FileLink> {
+        return this.episodesService.getStreamingLink(magnet, season, episode).pipe(
             map(response => response)
         );
     }

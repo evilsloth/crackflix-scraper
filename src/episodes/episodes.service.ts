@@ -32,8 +32,13 @@ export class EpisodesService {
             .getSources(scraper => this.a4kScrapersService.getEpisodes({ ...scraperParams, scraper }));
     }
 
-    getStreamingLink(url: string): Observable<FileLink> {
-        return this.scraperSourceResolverService.getStreamingLink(url);
+    getStreamingLink(url: string, season?: number, episode?: number): Observable<FileLink> {
+        if (season != null && episode != null) {
+            const episodeRegex = new RegExp(`s0?${season}e0?${episode}(\\D|$)`, 'i'); // any other formats?
+            return this.scraperSourceResolverService.getStreamingLink(url, link => episodeRegex.test(link.filename));
+        } else {
+            return this.scraperSourceResolverService.getStreamingLink(url);
+        }
     }
 
 }
