@@ -10,6 +10,8 @@ import { Source } from 'src/common/model/source';
 import { A4kScrapersService } from 'src/common/scrapers/a4k-scrapers/a4k-scrapers.service';
 import { ScraperSource } from 'src/common/scrapers/a4k-scrapers/scraper-source';
 import { filterDuplicates, groupBy } from 'src/common/utils/array-utils';
+import { DownloadInfo } from '../model/download-info';
+import { DownloadStatus } from '../model/download-status';
 
 const VIDEO_EXTENSIONS = ['webm', 'mkv', 'flv', 'vob', 'ogv', 'ogg', 'avi', 'mp4', 'mts', 'm2ts', 'ts', 'mov', 'wmv',
     'rm', 'rmvb', 'm4p', 'm4v', 'mpg', 'mp2', 'mpeg', 'mpe', 'mpv', 'm2v', '3gp', 'divx', 'xvid']
@@ -54,6 +56,38 @@ export class ScraperSourceResolverService {
                 fileName: link.filename,
                 link: link.link,
                 fileSize: link.filesize
+            }))
+        );
+    }
+
+    startDownload(url: string): Observable<DownloadInfo> {
+        return this.allDebridService.uploadMagnet(url).pipe(
+            map(response => this.extractAllDebridResponseData(response).magnets[0]),
+            map(magnet => ({
+                id: magnet.id,
+                name: magnet.name,
+                size: magnet.size,
+                ready: magnet.ready
+            }))
+        );
+    }
+
+    getDownloadStatus(id: number): Observable<DownloadStatus> {
+        return this.allDebridService.getMagnetStatus(id).pipe(
+            map(response => this.extractAllDebridResponseData(response).magnets),
+            map(status => ({
+                id: status.id,
+                filename: status.filename,
+                size: status.size,
+                status: status.status,
+                statusCode: status.statusCode,
+                downloaded: status.downloaded,
+                uploaded: status.uploaded,
+                seeders: status.seeders,
+                downloadSpeed: status.downloadSpeed,
+                uploadSpeed: status.uploadSpeed,
+                uploadDate: status.uploadDate,
+                completionDate: status.completionDate
             }))
         );
     }
