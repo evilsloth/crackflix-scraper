@@ -48,7 +48,12 @@ export class ScraperSourceResolverService {
     getStreamingLink(url: string, linkFilter: (link: MagnetLinks) => boolean = null): Observable<FileLink> {
         return this.allDebridService.uploadMagnet(url).pipe(
             map(response => this.extractAllDebridResponseData(response).magnets[0]),
-            switchMap(magnet => this.allDebridService.getMagnetStatus(magnet.id)),
+            switchMap(magnet => this.getStreamingLinkById(magnet.id, linkFilter))
+        );
+    }
+
+    getStreamingLinkById(id: number, linkFilter: (link: MagnetLinks) => boolean = null): Observable<FileLink> {
+        return this.allDebridService.getMagnetStatus(id).pipe(
             map(response => this.extractAllDebridResponseData(response).magnets),
             switchMap(status => this.allDebridService.getUnlockedLink(this.findVideoLink(status.links, linkFilter))),
             map(response => this.extractAllDebridResponseData(response)),

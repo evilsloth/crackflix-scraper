@@ -29,5 +29,9 @@ export class MoviesService {
     getStreamingLink(url: string): Observable<FileLink> {
         return this.scraperSourceResolverService.getStreamingLink(url);
     }
+    
+    getStreamingLinkById(id: number): Observable<FileLink> {
+        return this.scraperSourceResolverService.getStreamingLinkById(id);
+    }
 
 }

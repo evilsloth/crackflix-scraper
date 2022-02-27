@@ -34,11 +34,24 @@ export class EpisodesService {
 
     getStreamingLink(url: string, season?: number, episode?: number): Observable<FileLink> {
         if (season != null && episode != null) {
-            const episodeRegex = new RegExp(`s0?${season}e0?${episode}(\\D|$)`, 'i'); // any other formats?
+            const episodeRegex = this.getEpisodeRegex(season, episode);
             return this.scraperSourceResolverService.getStreamingLink(url, link => episodeRegex.test(link.filename));
         } else {
             return this.scraperSourceResolverService.getStreamingLink(url);
         }
+    }
+
+    getStreamingLinkById(id: number, season?: number, episode?: number): Observable<FileLink> {
+        if (season != null && episode != null) {
+            const episodeRegex = this.getEpisodeRegex(season, episode);
+            return this.scraperSourceResolverService.getStreamingLinkById(id, link => episodeRegex.test(link.filename));
+        } else {
+            return this.scraperSourceResolverService.getStreamingLinkById(id);
+        }
+    }
+
+    private getEpisodeRegex(season: number, episode: number) {
+        return new RegExp(`s0?${season}e0?${episode}(\\D|$)`, 'i'); // any other formats?
     }
 
 }

@@ -19,11 +19,16 @@ export class EpisodesController {
     @Get('episodes/link')
     getStreamingLink(
         @Query('magnet') magnet: string,
+        @Query('id') id: number,
         @Query('season') season?: number,
         @Query('episode') episode?: number): Observable<FileLink> {
-        return this.episodesService.getStreamingLink(magnet, season, episode).pipe(
-            map(response => response)
-        );
+        if (magnet) {
+            return this.episodesService.getStreamingLink(magnet, season, episode);
+        } else if (id) {
+            return this.episodesService.getStreamingLinkById(id, season, episode);
+        }
+
+        throw Error('One of "magnet" or "id" query param must be passed!');
     }
 
 }

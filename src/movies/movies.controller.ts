@@ -17,10 +17,14 @@ export class MoviesController {
     }
     
     @Get('movies/link')
-    getStreamingLink(@Query('magnet') magnet: string): Observable<FileLink> {
-        return this.moviesService.getStreamingLink(magnet).pipe(
-            map(response => response)
-        );
+    getStreamingLink(@Query('magnet') magnet: string, @Query('id') id: number): Observable<FileLink> {
+        if (magnet) {
+            return this.moviesService.getStreamingLink(magnet);
+        } else if (id) {
+            return this.moviesService.getStreamingLinkById(id);
+        }
+
+        throw Error('One of "magnet" or "id" query param must be passed!');
     }
 
 }
