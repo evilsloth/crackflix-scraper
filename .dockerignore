@@ -8,6 +8,9 @@ node_modules
 # git
 .git
 
+# github
+.github
+
 # docs
 *.md
 
