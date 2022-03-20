@@ -108,7 +108,6 @@ export class ScraperSourceResolverService {
             return found[0]?.link;
         }
 
-        console.error('Reolve error', links);
         throw Error('Could not resolve video stream link');
     }
 
@@ -124,16 +123,13 @@ export class ScraperSourceResolverService {
 
     private extractAllDebridResponseData<T>(response: AxiosResponse<AllDebridResponse<T>>): T {
         if (response.status !== 200) {
-            console.error('Service error', response.config.url, response.status, response.data);
             throw Error('Server error ' + response.status);
         }
 
         const data = response.data;
         if (data.status === 'success') {
-            console.debug(response.config.url, data.data);
             return data.data;
         } else {
-            console.error('All debrid api error', response.config.url, data.error);
             throw Error('All Debrid service error');
         }
     }
