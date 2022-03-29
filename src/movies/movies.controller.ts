@@ -17,7 +17,10 @@ export class MoviesController {
     }
     
     @Get('movies/link')
-    getStreamingLink(@Query('magnet') magnet: string, @Query('id') id: number): Observable<FileLink> {
+    getStreamingLink(
+        @Query('magnet') magnet?: string,
+        @Query('id') id?: number
+    ): Observable<FileLink> {
         if (magnet) {
             return this.moviesService.getStreamingLink(magnet);
         } else if (id) {

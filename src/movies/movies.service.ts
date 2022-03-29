@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Observable } from 'rxjs';
+import { VIDEO_FILE_LINK_FILTER } from 'src/common/filters/file-link-filters';
 import { FileLink } from 'src/common/model/file-link';
 import { Source } from 'src/common/model/source';
 import { A4kScrapersService } from 'src/common/scrapers/a4k-scrapers/a4k-scrapers.service';
@@ -27,11 +28,11 @@ export class MoviesService {
     }
 
     getStreamingLink(url: string): Observable<FileLink> {
-        return this.scraperSourceResolverService.getStreamingLink(url);
+        return this.scraperSourceResolverService.getStreamingLink(url, VIDEO_FILE_LINK_FILTER);
     }
     
     getStreamingLinkById(id: number): Observable<FileLink> {
-        return this.scraperSourceResolverService.getStreamingLinkById(id);
+        return this.scraperSourceResolverService.getStreamingLinkById(id, VIDEO_FILE_LINK_FILTER);
     }
 
 }

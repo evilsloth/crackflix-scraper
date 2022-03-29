@@ -18,10 +18,11 @@ export class EpisodesController {
     
     @Get('episodes/link')
     getStreamingLink(
-        @Query('magnet') magnet: string,
-        @Query('id') id: number,
-        @Query('season') season?: number,
-        @Query('episode') episode?: number): Observable<FileLink> {
+        @Query('season') season: number,
+        @Query('episode') episode: number,
+        @Query('magnet') magnet?: string,
+        @Query('id') id?: number,
+    ): Observable<FileLink> {
         if (magnet) {
             return this.episodesService.getStreamingLink(magnet, season, episode);
         } else if (id) {

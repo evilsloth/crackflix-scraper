@@ -4,17 +4,14 @@ import { forkJoin, map, Observable, of, switchMap } from 'rxjs';
 import { AllDebridResponse } from 'src/common/all-debrid/all-debrid-response';
 import { AllDebridService } from 'src/common/all-debrid/all-debrid.service';
 import { MagnetInstantStatus } from 'src/common/all-debrid/magnets/magnet-instant-status';
-import { MagnetLinks } from 'src/common/all-debrid/magnets/magnet-links';
 import { FileLink } from 'src/common/model/file-link';
 import { Source } from 'src/common/model/source';
 import { A4kScrapersService } from 'src/common/scrapers/a4k-scrapers/a4k-scrapers.service';
 import { ScraperSource } from 'src/common/scrapers/a4k-scrapers/scraper-source';
 import { filterDuplicates, groupBy } from 'src/common/utils/array-utils';
+import { FileLinkFilter } from '../filters/file-link-filters';
 import { DownloadInfo } from '../model/download-info';
 import { DownloadStatus } from '../model/download-status';
-
-const VIDEO_EXTENSIONS = ['webm', 'mkv', 'flv', 'vob', 'ogv', 'ogg', 'avi', 'mp4', 'mts', 'm2ts', 'ts', 'mov', 'wmv',
-    'rm', 'rmvb', 'm4p', 'm4v', 'mpg', 'mp2', 'mpeg', 'mpe', 'mpv', 'm2v', '3gp', 'divx', 'xvid']
 
 @Injectable()
 export class ScraperSourceResolverService {
@@ -45,17 +42,39 @@ export class ScraperSourceResolverService {
         );
     }
 
-    getStreamingLink(url: string, linkFilter: (link: MagnetLinks) => boolean = null): Observable<FileLink> {
+    getStreamingLink(url: string, linkFilter: FileLinkFilter): Observable<FileLink> {
         return this.allDebridService.uploadMagnet(url).pipe(
             map(response => this.extractAllDebridResponseData(response).magnets[0]),
             switchMap(magnet => this.getStreamingLinkById(magnet.id, linkFilter))
         );
     }
 
-    getStreamingLinkById(id: number, linkFilter: (link: MagnetLinks) => boolean = null): Observable<FileLink> {
+    getStreamingLinkById(id: number, linkFilter: FileLinkFilter): Observable<FileLink> {
+        return this.getLinksById(id).pipe(
+            switchMap(links => this.getUnlockedLink(this.findVideoLink(links, linkFilter)))
+        );
+    }
+
+    getLinks(url: string): Observable<FileLink[]> {
+        return this.allDebridService.uploadMagnet(url).pipe(
+            map(response => this.extractAllDebridResponseData(response).magnets[0]),
+            switchMap(magnet => this.getLinksById(magnet.id))
+        );
+    }
+
+    getLinksById(id: number): Observable<FileLink[]> {
         return this.allDebridService.getMagnetStatus(id).pipe(
             map(response => this.extractAllDebridResponseData(response).magnets),
-            switchMap(status => this.allDebridService.getUnlockedLink(this.findVideoLink(status.links, linkFilter))),
+            map(status => status.links.map(link => ({
+                fileName: link.filename,
+                link: link.link,
+                fileSize: link.size
+            })))
+        );
+    }
+
+    getUnlockedLink(link: string): Observable<FileLink> {
+        return this.allDebridService.getUnlockedLink(link).pipe(
             map(response => this.extractAllDebridResponseData(response)),
             map(link => ({
                 fileName: link.filename,
@@ -97,13 +116,11 @@ export class ScraperSourceResolverService {
         );
     }
 
-    private findVideoLink(links: MagnetLinks[], filter: (link: MagnetLinks) => boolean): string {
-        const found = links
-            .filter(link => VIDEO_EXTENSIONS.indexOf(link.filename.split('.').pop().toLowerCase()) !== -1)
-            .filter(filter || (link => link));
+    private findVideoLink(links: FileLink[], filter: FileLinkFilter): string {
+        const found = links.filter(filter || (link => link));
 
         // biggest first (in case of samples in package)
-        found.sort((a, b) => b.size - a.size);
+        found.sort((a, b) => b.fileSize - a.fileSize);
         if (found.length > 0) {
             return found[0]?.link;
         }

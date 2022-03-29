@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Observable } from 'rxjs';
+import { combinedFilter, episodeFilter, FileLinkFilter, VIDEO_FILE_LINK_FILTER } from 'src/common/filters/file-link-filters';
 import { A4kScrapersService } from 'src/common/scrapers/a4k-scrapers/a4k-scrapers.service';
 import { ScraperEpisodeSearchParams } from 'src/common/scrapers/a4k-scrapers/scraper-episode-search-params';
 import { ScraperSourceResolverService } from 'src/common/service/scraper-source-resolver.service';
@@ -32,26 +33,14 @@ export class EpisodesService {
             .getSources(scraper => this.a4kScrapersService.getEpisodes({ ...scraperParams, scraper }));
     }
 
-    getStreamingLink(url: string, season?: number, episode?: number): Observable<FileLink> {
-        if (season != null && episode != null) {
-            const episodeRegex = this.getEpisodeRegex(season, episode);
-            return this.scraperSourceResolverService.getStreamingLink(url, link => episodeRegex.test(link.filename));
-        } else {
-            return this.scraperSourceResolverService.getStreamingLink(url);
-        }
+    getStreamingLink(url: string, season: number, episode: number): Observable<FileLink> {
+        const filter: FileLinkFilter = combinedFilter(VIDEO_FILE_LINK_FILTER, episodeFilter(season, episode));
+        return this.scraperSourceResolverService.getStreamingLink(url, filter);
     }
 
-    getStreamingLinkById(id: number, season?: number, episode?: number): Observable<FileLink> {
-        if (season != null && episode != null) {
-            const episodeRegex = this.getEpisodeRegex(season, episode);
-            return this.scraperSourceResolverService.getStreamingLinkById(id, link => episodeRegex.test(link.filename));
-        } else {
-            return this.scraperSourceResolverService.getStreamingLinkById(id);
-        }
-    }
-
-    private getEpisodeRegex(season: number, episode: number) {
-        return new RegExp(`s0?${season}e0?${episode}(\\D|$)`, 'i'); // any other formats?
+    getStreamingLinkById(id: number, season: number, episode: number): Observable<FileLink> {
+        const filter: FileLinkFilter = combinedFilter(VIDEO_FILE_LINK_FILTER, episodeFilter(season, episode));
+        return this.scraperSourceResolverService.getStreamingLinkById(id, filter);
     }
 
 }
