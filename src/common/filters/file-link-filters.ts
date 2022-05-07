@@ -10,8 +10,13 @@ export const VIDEO_FILE_LINK_FILTER: FileLinkFilter = (fileLink: FileLink) => {
 }
 
 export function episodeFilter(season: number, episode: number): FileLinkFilter {
-    const episodeRegex = new RegExp(`s0?${season}e0?${episode}(\\D|$)`, 'i'); // any other formats?
-    return (fileLink: FileLink) => episodeRegex.test(fileLink.fileName);
+    // any other formats?
+    const episodeRegexes = [
+        new RegExp(`s0?${season}e0?${episode}(\\D|$)`, 'i'), // s01e02
+        new RegExp(`(\\D|^)0?${season}x0?${episode}(\\D|$)`, 'i'), // 1x2
+        new RegExp(`(\\D|^)${season}${episode.toString().padStart(2, '0')}(\\D|$)`, 'i') // 102
+    ];
+    return (fileLink: FileLink) => episodeRegexes.some(regex => regex.test(fileLink.fileName));
 }
 
 export function combinedFilter(...filters: FileLinkFilter[]): FileLinkFilter {
