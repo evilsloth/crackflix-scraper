@@ -1,10 +1,12 @@
 import { CacheInterceptor, Controller, Get, Query, UseInterceptors } from '@nestjs/common';
-import { map, Observable } from 'rxjs';
-import { FileLink } from '../common/model/file-link';
-import { Source } from '../common/model/source';
-import { EpisodeSearchParams } from './episode-search-params';
+import { ApiTags } from '@nestjs/swagger';
+import { Observable } from 'rxjs';
+import { FileLink } from '../common/model/file-link.dto';
+import { Source } from '../common/model/source.dto';
+import { EpisodeSearchParams } from './episode-search-params.dto';
 import { EpisodesService } from './episodes.service';
 
+@ApiTags('episodes')
 @UseInterceptors(CacheInterceptor)
 @Controller()
 export class EpisodesController {
@@ -17,7 +19,7 @@ export class EpisodesController {
     }
     
     @Get('episodes/link')
-    getStreamingLink(
+    getEpisodeStreamingLink(
         @Query('season') season: number,
         @Query('episode') episode: number,
         @Query('magnet') magnet?: string,

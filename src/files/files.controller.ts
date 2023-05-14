@@ -1,11 +1,13 @@
 import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { Observable } from 'rxjs';
-import { DownloadInfo } from 'src/common/model/download-info';
-import { DownloadStatus } from 'src/common/model/download-status';
-import { FileLink } from 'src/common/model/file-link';
+import { DownloadInfo } from 'src/common/model/download-info.dto';
+import { DownloadStatus } from 'src/common/model/download-status.dto';
+import { FileLink } from 'src/common/model/file-link.dto';
 import { ScraperSourceResolverService } from 'src/common/service/scraper-source-resolver.service';
-import { DownloadRequest } from './download-request';
+import { DownloadRequest } from './download-request.dto';
 
+@ApiTags('files')
 @Controller()
 export class FilesController {
 

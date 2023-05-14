@@ -1,4 +1,4 @@
-export interface EpisodeSearchParams {
+export class EpisodeSearchParams {
     showTitle: string;
     episodeTitle?: string;
     year?: string;

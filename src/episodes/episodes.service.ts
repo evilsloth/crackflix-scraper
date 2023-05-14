@@ -4,9 +4,9 @@ import { combinedFilter, episodeFilter, FileLinkFilter, VIDEO_FILE_LINK_FILTER }
 import { A4kScrapersService } from 'src/common/scrapers/a4k-scrapers/a4k-scrapers.service';
 import { ScraperEpisodeSearchParams } from 'src/common/scrapers/a4k-scrapers/scraper-episode-search-params';
 import { ScraperSourceResolverService } from 'src/common/service/scraper-source-resolver.service';
-import { FileLink } from '../common/model/file-link';
-import { Source } from '../common/model/source';
-import { EpisodeSearchParams } from './episode-search-params';
+import { FileLink } from '../common/model/file-link.dto';
+import { Source } from '../common/model/source.dto';
+import { EpisodeSearchParams } from './episode-search-params.dto';
 
 @Injectable()
 export class EpisodesService {

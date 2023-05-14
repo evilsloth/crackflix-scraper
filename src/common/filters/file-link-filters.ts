@@ -1,4 +1,4 @@
-import { FileLink } from '../model/file-link';
+import { FileLink } from '../model/file-link.dto';
 
 export type FileLinkFilter = (fileLink: FileLink) => boolean;
 

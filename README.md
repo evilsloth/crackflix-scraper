@@ -46,3 +46,10 @@ $ npm run test:e2e
 # test coverage
 $ npm run test:cov
 ```
+## OpenAPI (Swagger)
+
+API documentation in OpenAPI format can be accessed after running the app:
+
+- UI: http://localhost:3000/spec
+- JSON file: http://localhost:3000/spec-json
+- YAML file: http://localhost:3000/spec-yaml

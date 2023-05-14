@@ -1,4 +1,4 @@
-export interface DownloadStatus {
+export class DownloadStatus {
     id: number;
     filename: string;
     size: number;

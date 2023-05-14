@@ -1,10 +1,12 @@
 import { CacheInterceptor, Controller, Get, Query, UseInterceptors } from '@nestjs/common';
-import { map, Observable } from 'rxjs';
-import { FileLink } from '../common/model/file-link';
-import { Source } from '../common/model/source';
-import { MovieSearchParams } from './movie-search-params';
+import { ApiTags } from '@nestjs/swagger';
+import { Observable } from 'rxjs';
+import { FileLink } from '../common/model/file-link.dto';
+import { Source } from '../common/model/source.dto';
+import { MovieSearchParams } from './movie-search-params.dto';
 import { MoviesService } from './movies.service';
 
+@ApiTags('movies')
 @UseInterceptors(CacheInterceptor)
 @Controller()
 export class MoviesController {
@@ -12,12 +14,12 @@ export class MoviesController {
     constructor(private moviesService: MoviesService) {}
 
     @Get('movies')
-    getEpisodeSources(@Query() searchParams: MovieSearchParams): Observable<Source[]> {
+    getMovieSources(@Query() searchParams: MovieSearchParams): Observable<Source[]> {
         return this.moviesService.getEpisodeSources(searchParams);
     }
     
     @Get('movies/link')
-    getStreamingLink(
+    getMovieStreamingLink(
         @Query('magnet') magnet?: string,
         @Query('id') id?: number
     ): Observable<FileLink> {

@@ -4,14 +4,14 @@ import { forkJoin, map, Observable, of, switchMap } from 'rxjs';
 import { AllDebridResponse } from 'src/common/all-debrid/all-debrid-response';
 import { AllDebridService } from 'src/common/all-debrid/all-debrid.service';
 import { MagnetInstantStatus } from 'src/common/all-debrid/magnets/magnet-instant-status';
-import { FileLink } from 'src/common/model/file-link';
-import { Source } from 'src/common/model/source';
+import { FileLink } from 'src/common/model/file-link.dto';
+import { Source } from 'src/common/model/source.dto';
 import { A4kScrapersService } from 'src/common/scrapers/a4k-scrapers/a4k-scrapers.service';
 import { ScraperSource } from 'src/common/scrapers/a4k-scrapers/scraper-source';
 import { filterDuplicates, groupBy } from 'src/common/utils/array-utils';
 import { FileLinkFilter } from '../filters/file-link-filters';
-import { DownloadInfo } from '../model/download-info';
-import { DownloadStatus } from '../model/download-status';
+import { DownloadInfo } from '../model/download-info.dto';
+import { DownloadStatus } from '../model/download-status.dto';
 
 @Injectable()
 export class ScraperSourceResolverService {

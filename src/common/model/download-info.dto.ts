@@ -1,4 +1,4 @@
-export interface DownloadInfo {
+export class DownloadInfo {
     id: number;
     name: string;
     size: number;

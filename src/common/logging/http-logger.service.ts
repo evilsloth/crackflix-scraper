@@ -1,7 +1,6 @@
 import { HttpService } from '@nestjs/axios';
 import { Injectable, Logger } from '@nestjs/common';
 import { randomUUID } from 'crypto';
-import { url } from 'inspector';
 
 @Injectable()
 export class HttpLoggerService {
