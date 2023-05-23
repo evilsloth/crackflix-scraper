@@ -25,7 +25,7 @@ export class ScraperSourceResolverService {
             map(scrapers => scrapers.map(scraper => searchResultsGetter(scraper))),
             switchMap(requests => forkJoin(requests)),
             map(responses => responses.reduce((array, response) => [...array, ...response.data], [])),
-            map(sources => filterDuplicates(sources, (s1, s2) => s1.magnet === s2.magnet)),
+            map(sources => filterDuplicates(sources, (s1, s2) => s1.hash === s2.hash)),
             switchMap(sources => forkJoin([of(sources), this.getInstantStatuses(sources)])),
             map(([sources, instantStatuses]) => {
                 const instantByMagnet = groupBy(instantStatuses, status => status.magnet);

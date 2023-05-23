@@ -8,6 +8,7 @@ import { UnlockedLink } from './links/unlocked-link';
 import { MagnetsInstantStatuses } from './magnets/magnets-instant-statuses';
 import { MagnetsSingleStatus } from './magnets/magnets-statuses';
 import { MagnetsUploadStatuses } from './magnets/magnets-upload-statuses';
+import * as FormData from 'form-data';
 
 @Injectable()
 export class AllDebridService {
@@ -32,7 +33,9 @@ export class AllDebridService {
     }
 
     getMagnetsInstantStatuses(magnets: string[]): Observable<AxiosResponse<AllDebridResponse<MagnetsInstantStatuses>>> {
-        return this.http.get(this.baseUrl + '/magnet/instant', { params: { ...this.apiParams, magnets } });
+        const formData = new FormData();
+        magnets.forEach(magnet => formData.append('magnets[]', magnet));
+        return this.http.post(this.baseUrl + '/magnet/instant', formData, { params: { ...this.apiParams } });
     }
 
     getUnlockedLink(link: string): Observable<AxiosResponse<AllDebridResponse<UnlockedLink>>> {
