@@ -12,7 +12,7 @@ export class LoggerMiddleware implements NestMiddleware {
             requestId: req['requestId'],
             method: req.method,
             url: req.url,
-            body: req.body,
+            // body: req.body, // uncomment for debugging
             headers: req.headers
         };
         this.logger.debug('Request: ' + JSON.stringify(requestData));
@@ -24,7 +24,7 @@ export class LoggerMiddleware implements NestMiddleware {
                 url: res.req.url,
                 statusCode: res.statusCode,
                 statusMessage: res.statusMessage,
-                body: res.json,
+                // body: res.json, // uncomment for debugging
                 headers: res.getHeaders()
             };
             this.logger.debug('Response: ' + JSON.stringify(responseData));

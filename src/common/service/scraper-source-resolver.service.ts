@@ -133,8 +133,20 @@ export class ScraperSourceResolverService {
             return of([]);
         }
 
-        return this.allDebridService.getMagnetsInstantStatuses(sources.map(source => source.hash)).pipe(
-            map(response => this.extractAllDebridResponseData(response).magnets)
+        const hashes = sources.map(source => source.hash);
+
+        const chunkSize = 100;
+        const chunkObservables: Observable<MagnetInstantStatus[]>[] = [];
+        for (let i = 0; i < hashes.length; i += chunkSize) {
+            const hashesChunk = hashes.slice(i, i + chunkSize);
+            const chunkObservable = this.allDebridService.getMagnetsInstantStatuses(hashesChunk).pipe(
+                map(response => this.extractAllDebridResponseData(response).magnets)
+            );
+            chunkObservables.push(chunkObservable);
+        }
+
+        return forkJoin(chunkObservables).pipe(
+            map(responses => [].concat(...responses))
         );
     }
 

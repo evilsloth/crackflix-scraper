@@ -18,7 +18,7 @@ export class HttpLoggerService {
                 method: config.method,
                 url: config.url,
                 params: config.params,
-                data: config.data,
+                // data: config.data, // uncomment for debugging
                 headers: config.headers
             };
             this.logger.debug('Request: ' + JSON.stringify(requestData));
@@ -36,7 +36,7 @@ export class HttpLoggerService {
                 params: response.config.params,
                 status: response.status,
                 statusText: response.statusText,
-                data: response.data,
+                // data: response.data, // uncomment for debugging
                 headers: response.headers
             };
             this.logger.debug('Response: ' + JSON.stringify(responseData));
