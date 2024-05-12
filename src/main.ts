@@ -8,6 +8,7 @@ async function bootstrap() {
     const config = new DocumentBuilder()
         .setTitle('Crackflix Scraper')
         .setVersion('1.0')
+        .addApiKey({ type: 'apiKey', in: 'header'}, 'apiKey')
         .build();
     const options: SwaggerDocumentOptions = {
         operationIdFactory: (

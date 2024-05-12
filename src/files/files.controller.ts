@@ -1,5 +1,5 @@
 import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiSecurity, ApiTags } from '@nestjs/swagger';
 import { Observable } from 'rxjs';
 import { DownloadInfo } from 'src/common/model/download-info.dto';
 import { DownloadStatus } from 'src/common/model/download-status.dto';
@@ -8,6 +8,7 @@ import { ScraperSourceResolverService } from 'src/common/service/scraper-source-
 import { DownloadRequest } from './download-request.dto';
 
 @ApiTags('files')
+@ApiSecurity('apiKey')
 @Controller()
 export class FilesController {
 

@@ -15,6 +15,12 @@ export ALL_DEBRID_AGENT=agent
 export ALL_DEBRID_API_KEY=api_key
 ```
 
+You may also wish to configure API_KEY property to secure api access.
+```
+export API_KEY=some_random_key
+```
+This value should be then passed in "apiKey" request header.
+
 ## Installation
 
 ```bash
