@@ -76,6 +76,10 @@ export class JackettScraperService implements ScraperService {
     }
 
     private getScraperSources(items: any[]): ScraperSource[] {
+        if (!items) {
+            return [];
+        }
+
         return items
             .map((item) => this.toScraperSource(item))
             .filter((source: ScraperSource) => source.hash != null);
