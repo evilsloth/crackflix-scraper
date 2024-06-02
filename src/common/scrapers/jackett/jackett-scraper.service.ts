@@ -89,7 +89,7 @@ export class JackettScraperService implements ScraperService {
             release_title: item.title,
             scraper: item.jackettindexer['#text'] + ' (jackett)',
             seeds: +this.findAttributeValue(item, 'seeders'),
-            size: item.size
+            size: Math.round(+item.size / 1048576)
         };
     }
 
