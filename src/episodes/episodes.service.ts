@@ -1,18 +1,18 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { Observable } from 'rxjs';
-import { combinedFilter, episodeFilter, FileLinkFilter, VIDEO_FILE_LINK_FILTER } from 'src/common/filters/file-link-filters';
-import { A4kScrapersService } from 'src/common/scrapers/a4k-scrapers/a4k-scrapers.service';
-import { ScraperEpisodeSearchParams } from 'src/common/scrapers/a4k-scrapers/scraper-episode-search-params';
-import { ScraperSourceResolverService } from 'src/common/service/scraper-source-resolver.service';
+import { FileLinkFilter, VIDEO_FILE_LINK_FILTER, combinedFilter, episodeFilter } from '../common/filters/file-link-filters';
 import { FileLink } from '../common/model/file-link.dto';
 import { Source } from '../common/model/source.dto';
+import { ScraperEpisodeSearchParams } from '../common/scrapers/common/scraper-episode-search-params';
+import { ScraperService } from '../common/scrapers/common/scraper.service';
+import { ScraperSourceResolverService } from '../common/service/scraper-source-resolver.service';
 import { EpisodeSearchParams } from './episode-search-params.dto';
 
 @Injectable()
 export class EpisodesService {
 
     constructor(
-        private a4kScrapersService: A4kScrapersService,
+        @Inject('SCRAPER_SERVICES') private scraperServices: ScraperService[],
         private scraperSourceResolverService: ScraperSourceResolverService) {
     }
 
@@ -29,8 +29,8 @@ export class EpisodesService {
             imdb: searchParams.imdb
         };
 
-        return this.scraperSourceResolverService
-            .getSources(scraper => this.a4kScrapersService.getEpisodes({ ...scraperParams, scraper }));
+        const sources = this.scraperServices.map((service) => service.getEpisodes(scraperParams));
+        return this.scraperSourceResolverService.getSources(sources);
     }
 
     getStreamingLink(url: string, season: number, episode: number): Observable<FileLink> {

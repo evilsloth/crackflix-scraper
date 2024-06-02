@@ -5,20 +5,30 @@ import { AllDebridService } from './all-debrid/all-debrid.service';
 import { HttpLoggerService } from './logging/http-logger.service';
 import { A4kScrapersService } from './scrapers/a4k-scrapers/a4k-scrapers.service';
 import { ScraperSourceResolverService } from './service/scraper-source-resolver.service';
+import { JackettScraperService } from './scrapers/jackett/jackett-scraper.service';
+import { SCRAPER_SERVICES } from './scrapers/common/scraper.service';
 
 @Module({
     imports: [HttpModule, ConfigModule],
     providers: [
         HttpLoggerService,
-        A4kScrapersService,
         AllDebridService,
-        ScraperSourceResolverService
+        ScraperSourceResolverService,
+        A4kScrapersService,
+        JackettScraperService,
+        {
+            provide: SCRAPER_SERVICES,
+            useFactory: (...services) => [...services],
+            inject: [A4kScrapersService, JackettScraperService]
+        }
     ],
     exports: [
         HttpLoggerService,
-        A4kScrapersService,
         AllDebridService,
-        ScraperSourceResolverService
+        ScraperSourceResolverService,
+        A4kScrapersService,
+        JackettScraperService,
+        SCRAPER_SERVICES
     ]
 })
 export class CommonModule {

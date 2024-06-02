@@ -1,18 +1,18 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { Observable } from 'rxjs';
-import { VIDEO_FILE_LINK_FILTER } from 'src/common/filters/file-link-filters';
-import { FileLink } from 'src/common/model/file-link.dto';
-import { Source } from 'src/common/model/source.dto';
-import { A4kScrapersService } from 'src/common/scrapers/a4k-scrapers/a4k-scrapers.service';
-import { ScraperMovieSearchParams } from 'src/common/scrapers/a4k-scrapers/scraper-movie-search-params';
-import { ScraperSourceResolverService } from 'src/common/service/scraper-source-resolver.service';
+import { VIDEO_FILE_LINK_FILTER } from '../common/filters/file-link-filters';
+import { FileLink } from '../common/model/file-link.dto';
+import { Source } from '../common/model/source.dto';
+import { ScraperMovieSearchParams } from '../common/scrapers/common/scraper-movie-search-params';
+import { ScraperService } from '../common/scrapers/common/scraper.service';
+import { ScraperSourceResolverService } from '../common/service/scraper-source-resolver.service';
 import { MovieSearchParams } from './movie-search-params.dto';
 
 @Injectable()
 export class MoviesService {
 
     constructor(
-        private a4kScrapersService: A4kScrapersService,
+        @Inject('SCRAPER_SERVICES') private scraperServices: ScraperService[],
         private scraperSourceResolverService: ScraperSourceResolverService) {
     }
 
@@ -23,14 +23,14 @@ export class MoviesService {
             imdb: searchParams.imdb
         };
 
-        return this.scraperSourceResolverService
-            .getSources(scraper => this.a4kScrapersService.getMovies({ ...scraperParams, scraper }));
+        const sources = this.scraperServices.map((service) => service.getMovies(scraperParams));
+        return this.scraperSourceResolverService.getSources(sources);
     }
 
     getStreamingLink(url: string): Observable<FileLink> {
         return this.scraperSourceResolverService.getStreamingLink(url, VIDEO_FILE_LINK_FILTER);
     }
-    
+
     getStreamingLinkById(id: number): Observable<FileLink> {
         return this.scraperSourceResolverService.getStreamingLinkById(id, VIDEO_FILE_LINK_FILTER);
     }

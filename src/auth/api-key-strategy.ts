@@ -21,7 +21,7 @@ export class ApiKeyStrategy extends PassportStrategy(HeaderAPIKeyStrategy) {
         });
 
         if (!configuredApiKey) {
-            this.logger.warn("API_KEY was not set! Api key validation will not be performed!");
+            this.logger.warn('API_KEY was not set! Api key validation will not be performed!');
         }
     }
 }

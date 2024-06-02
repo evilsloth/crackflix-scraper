@@ -1,14 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { AxiosResponse } from 'axios';
 import { forkJoin, map, Observable, of, switchMap } from 'rxjs';
-import { AllDebridResponse } from 'src/common/all-debrid/all-debrid-response';
-import { AllDebridService } from 'src/common/all-debrid/all-debrid.service';
-import { MagnetInstantStatus } from 'src/common/all-debrid/magnets/magnet-instant-status';
-import { FileLink } from 'src/common/model/file-link.dto';
-import { Source } from 'src/common/model/source.dto';
-import { A4kScrapersService } from 'src/common/scrapers/a4k-scrapers/a4k-scrapers.service';
-import { ScraperSource } from 'src/common/scrapers/a4k-scrapers/scraper-source';
-import { filterDuplicates, groupBy } from 'src/common/utils/array-utils';
+import { AllDebridResponse } from '../../common/all-debrid/all-debrid-response';
+import { AllDebridService } from '../../common/all-debrid/all-debrid.service';
+import { MagnetInstantStatus } from '../../common/all-debrid/magnets/magnet-instant-status';
+import { FileLink } from '../../common/model/file-link.dto';
+import { Source } from '../../common/model/source.dto';
+import { ScraperSource } from '../../common/scrapers/common/scraper-source';
+import { filterDuplicates, groupBy } from '../../common/utils/array-utils';
 import { FileLinkFilter } from '../filters/file-link-filters';
 import { DownloadInfo } from '../model/download-info.dto';
 import { DownloadStatus } from '../model/download-status.dto';
@@ -16,15 +15,14 @@ import { DownloadStatus } from '../model/download-status.dto';
 @Injectable()
 export class ScraperSourceResolverService {
 
-    constructor(private a4kScrapersService: A4kScrapersService, private allDebridService: AllDebridService) {
-    }
+    constructor(private allDebridService: AllDebridService) { }
 
-    getSources(searchResultsGetter: (scrapper: string) => Observable<AxiosResponse<ScraperSource[]>>): Observable<Source[]> {
-        return this.a4kScrapersService.getScrapers().pipe(
-            map(response => response.data),
-            map(scrapers => scrapers.map(scraper => searchResultsGetter(scraper))),
-            switchMap(requests => forkJoin(requests)),
-            map(responses => responses.reduce((array, response) => [...array, ...response.data], [])),
+    getSources(searchResults: Observable<ScraperSource[]>[]): Observable<Source[]> {
+        const results = forkJoin(searchResults).pipe(
+            map(res => [].concat(...res))
+        );
+
+        return results.pipe(
             map(sources => filterDuplicates(sources, (s1, s2) => s1.hash === s2.hash)),
             switchMap(sources => forkJoin([of(sources), this.getInstantStatuses(sources)])),
             map(([sources, instantStatuses]) => {
