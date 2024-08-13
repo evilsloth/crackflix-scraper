@@ -75,12 +75,13 @@ export class JackettScraperService implements ScraperService {
         return attribute != null ? attribute['@value'] : null;
     }
 
-    private getScraperSources(items: any[]): ScraperSource[] {
+    private getScraperSources(items: any[] | object): ScraperSource[] {
         if (!items) {
             return [];
         }
 
-        return items
+        const results = Array.isArray(items) ? items : [items];
+        return results
             .map((item) => this.toScraperSource(item))
             .filter((source: ScraperSource) => source.hash != null);
     }
